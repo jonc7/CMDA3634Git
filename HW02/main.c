@@ -28,17 +28,24 @@ int main (int argc, char **argv) {
 		return 0;  	
   }
 
-  int p;
+  int p = 4;
 
   /* Q2.2: Use isProbablyPrime and randomXbitInt to find a random n-bit prime number */
 
+  while (!isProbablyPrime(p)) p = randXbitInt(n);
   printf("p = %u is probably prime.\n", p);
 
   /* Q3.2: Use isProbablyPrime and randomXbitInt to find a new random n-bit prime number 
      which satisfies p=2*q+1 where q is also prime */
-  int q;
+  int q = (p-1) / 2;
+  while(!isProbablyPrime(q)) {
 
-	printf("p = %u is probably prime and equals 2*q + 1. q= %u and is also probably prime.\n", p, q);  
+	  p = randXbitInt(n);
+	  while (!isProbablyPrime(p)) p = randXbitInt(n);
+	  q = (p-1) / 2;
+  }
+
+	printf("p = %u is probably prime and equals 2*q + 1. q = %u and is also probably prime.\n", p, q);  
 
 	/* Q3.3: use the fact that p=2*q+1 to quickly find a generator */
 	unsigned int g = findGenerator(p);
