@@ -20,7 +20,7 @@ int main (int argc, char **argv) {
 	unsigned int n;
 
   printf("Enter a number of bits: ");
-  scanf("%u",&n);
+  int thisVariableIsToSupressWarnings = scanf("%u",&n);
 
   //make sure the input makes sense
   if ((n<2)||(n>30)) {
@@ -51,6 +51,17 @@ int main (int argc, char **argv) {
 	unsigned int g = findGenerator(p);
 
 	printf("g = %u is a generator of Z_%u \n", g, p);  
+
+	/* bonus */
+	unsigned int x = rand() % p;
+	unsigned int h = modExp(g, x, p);
+	unsigned int y = g;
+	unsigned int i = 0;
+	while(y != x) {
+		y = modprod(y, g, p);
+		i++;
+	}
+	printf("Actual x: %u\nGuess for x: %u\nIterations: %u\n", x, y, i);
 
   return 0;
 }

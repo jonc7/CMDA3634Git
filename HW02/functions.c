@@ -8,12 +8,14 @@
 unsigned int modprod(unsigned int a, unsigned int b, unsigned int p) {
 
 	unsigned int ab = 0;
+	unsigned int za = a;
 	for (int i = 0; b / (1 << i) > 0; i++) {
 
-		unsigned int bi = (1 << i) & b;
-		if (bi) ab = (ab + a*bi) % p;
+		if ((b >> i) & 1) ab = (ab + za) % p;
+		za = (2*za) % p;
 	}
-	return ab;
+
+	return (unsigned int)(ab);
 }
 
 //compute a^b mod p safely
@@ -46,7 +48,7 @@ unsigned int randXbitInt(unsigned int n) {
 //tests for primality and return 1 if N is probably prime and 0 if N is composite
 unsigned int isProbablyPrime(unsigned int N) {
 
-  if (N%2==2) return 0; //not interested in even numbers (including 2)
+  if (N%2==0) return 0; //not interested in even numbers (including 2)
 
   unsigned int NsmallPrimes = 168;
   unsigned int smallPrimeList[168] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 
