@@ -39,8 +39,8 @@ int main(int argc, char** argv) {
     double rand2;
 
     //gererate two random numbers (use the thread id to offset drandData)
-    drand48_r(drandData+0, &rand1);
-    drand48_r(drandData+0, &rand2);
+    drand48_r(drandData+omp_get_thread_num(), &rand1);
+    drand48_r(drandData+omp_get_thread_num(), &rand2);
     
     double x = -1 + 2*rand1; //shift to [-1,1]
     double y = -1 + 2*rand2;
