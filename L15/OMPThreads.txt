@@ -1,0 +1,1 @@
+Although running the program with 2 nodes is slower than running with 1, the data otherwise shows a clear trend of asymptotically approaching either 0 or some value relatively close to 0.
