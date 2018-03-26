@@ -20,27 +20,33 @@ int main (int argc, char **argv) {
 
   srand(seed);
 
-  //begin with rank 0 getting user's input
-  unsigned int n;
+  //delcare sotrage for an ElGamal cryptosystem
+  unsigned int p, g, h;
 
-  /* Q3.1 Make rank 0 setup the ELGamal system and
-    broadcast the public key information */
-  printf("Enter a number of bits: "); fflush(stdout);
-  char status = scanf("%u",&n);
+  if(rank == 0) {
+  	//begin with rank 0 getting user's input
+  	unsigned int n, x;
 
-  //make sure the input makes sense
-  if ((n<3)||(n>31)) {//Updated bounds. 2 is no good, 31 is actually ok
-    printf("Unsupported bit size.\n");
-    return 0;   
+  	/* Q3.1 Make rank 0 setup the ELGamal system and
+    	broadcast the public key information */
+  	//printf("Enter a number of bits: "); fflush(stdout);
+  	//char status = scanf("%u",&n);
+
+  	//make sure the input makes sense
+  	//if ((n<3)||(n>31)) {//Updated bounds. 2 is no good, 31 is actually ok
+    //	printf("Unsupported bit size.\n");
+    //	return 0;   
+  	//}
+  	//printf("\n");
+
+  	//setup an ElGamal cryptosystem
+	n = 22; //seems like a reasonable number to fix n at
+  	setupElGamal(n,&p,&g,&h,&x);
   }
-  printf("\n");
-
-  //declare storage for an ElGamal cryptosytem
-  unsigned int p, g, h, x;
-
-  //setup an ElGamal cryptosystem
-  setupElGamal(n,&p,&g,&h,&x);
-
+  
+  MPI_Bcast(&p, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&g, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&h, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
 
 
   //Suppose we don't know the secret key. Use all the ranks to try and find it in parallel
@@ -53,15 +59,23 @@ int main (int argc, char **argv) {
   unsigned int N = p-1; //total loop size
   unsigned int start, end;
   
-  start = 0; 
-  end = start + N;
+  start = rank*N/size; 
+  end = start + N/size;
 
+  double Stime = MPI_Wtime();
   //loop through the values from 'start' to 'end'
   for (unsigned int i=start;i<end;i++) {
     if (modExp(g,i+1,p)==h)
       printf("Secret key found! x = %u \n", i+1);
   }
-
+  if(rank == 0) {
+  	double Etime = MPI_Wtime();
+  	double time = Etime - Stime;
+  	double tp = N/time;
+  	printf("Time taken: %f\n", time);
+  	printf("Throughput: %f\n", tp);
+  }
+  
   MPI_Finalize();
 
   return 0;

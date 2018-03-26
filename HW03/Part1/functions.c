@@ -79,7 +79,6 @@ unsigned int isProbablyPrime(unsigned int N) {
   }
 
   //if we're testing a large number switch to Miller-Rabin primality test
-  /* Q2.1: Complete this part of the isProbablyPrime function using the Miller-Rabin pseudo-code */
   unsigned int r = 0;
   unsigned int d = N-1;
   while (d%2 == 0) {
@@ -123,7 +122,13 @@ void setupElGamal(unsigned int n, unsigned int *p, unsigned int *g,
                                   unsigned int *h, unsigned int *x) {
 
   /* Q1.1 Setup an ElGamal cryptographic system */
-  
+ 
+  do {
+	  *p = randXbitInt(n);
+  } while(!isProbablyPrime(*p));
+  *g = findGenerator(*p);
+  *x = rand()%*p;
+  *h = modExp(*g, *x, *p);
   printf("ElGamal Setup successful.\n");
   printf("p = %u. \n", *p);  
   printf("g = %u is a generator of Z_%u \n", *g, *p);  
@@ -136,10 +141,17 @@ void ElGamalEncrypt(unsigned int *m, unsigned int *a,
                     unsigned int p, unsigned int g, unsigned int h) {
 
   /* Q2.1 Implement the encryption routine for an ElGamal cryptographic system */
+	unsigned int y = rand()%p;
+	*a = modExp(g, y, p);
+	unsigned int s = modExp(h, y, p);
+	*m = modprod(*m, s, p);
 }
 
 void ElGamalDecrypt(unsigned int *m, unsigned int a, 
                     unsigned int p, unsigned int x) {
 
   /* Q2.2 Implement the decryption routine for an ElGamal cryptographic system */
+	unsigned int s = modExp(a, x, p);
+	s = modExp(s, p-2, p);
+	*m = modprod(*m, s, p);
 }
