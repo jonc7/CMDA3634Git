@@ -1,0 +1,3 @@
+Be sure to include the thread count as the second argument when invoking ./main
+ex. ./main 4
+Otherwise, the program will segfault.
