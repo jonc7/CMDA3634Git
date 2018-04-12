@@ -140,19 +140,19 @@ void setupElGamal(unsigned int n, unsigned int *p, unsigned int *g,
   //compute h
   *h = modExp(*g,*x,*p);
   
-  printf("ElGamal Setup successful.\n");
+  /*printf("ElGamal Setup successful.\n");
   printf("p = %u. \n", *p);  
   printf("g = %u is a generator of Z_%u \n", *g, *p);  
   printf("Secret key: x = %u \n", *x);
   printf("h = g^x = %u\n", *h);
-  printf("\n");
+  printf("\n");*/
 }
 
 void ElGamalEncrypt(unsigned int *m, unsigned int *a, unsigned int Nints, 
                     unsigned int p, unsigned int g, unsigned int h) {
 
   /* Q2.1 Parallelize this function with OpenMP   */
-
+	#pragma omp parallel for
   for (unsigned int i=0; i<Nints;i++) {
     //pick y in Z_p randomly
     unsigned int y;
@@ -175,7 +175,7 @@ void ElGamalDecrypt(unsigned int *m, unsigned int *a, unsigned int Nints,
                     unsigned int p, unsigned int x) {
 
   /* Q2.1 Parallelize this function with OpenMP   */
-
+	#pragma omp parallel for
   for (unsigned int i=0; i<Nints;i++) {
     //compute s = a^x
     unsigned int s = modExp(a[i],x,p);
@@ -194,6 +194,16 @@ void padString(unsigned char* string, unsigned int charsPerInt) {
 
   /* Q1.2 Complete this function   */
 
+	if(strlen(string) % charsPerInt != 0){
+		int initlen = strlen(string);
+		int i = 1;
+		string[initlen] = ' ';
+		while((initlen+i) % charsPerInt != 0){
+			strcat(string, " ");
+			i++;
+		}
+		strcat(string, "\00");
+	}
 }
 
 
@@ -202,7 +212,15 @@ void convertStringToZ(unsigned char *string, unsigned int Nchars,
 
   /* Q1.3 Complete this function   */
   /* Q2.2 Parallelize this function with OpenMP   */
-
+	unsigned int cpi = Nchars/Nints;
+	#pragma omp parallel for
+	for(int i = 0; i < Nints; i++){
+		Z[i] = 0;
+		for(int j = 0; j < cpi; j++){
+			Z[i] += (unsigned int) string[cpi*i+j] << (8*(cpi-j-1));
+		}
+		//printf("%u || %u = %u\n", (unsigned int) string[cpi*i], (unsigned int) string[cpi*i+1], Z[i]);
+	}
 }
 
 
@@ -211,6 +229,15 @@ void convertZToString(unsigned int  *Z,      unsigned int Nints,
 
   /* Q1.4 Complete this function   */
   /* Q2.2 Parallelize this function with OpenMP   */
-
+	unsigned int cpi = Nchars/Nints;
+	#pragma omp parallel for
+	for(int i = 0; i < Nints; i++){
+		for(int j = 0; j < cpi; j++){
+			string[i*cpi+j] = ' ';
+		}
+		for(int j = 0; j < cpi; j++){
+			string[i*cpi+j] = (Z[i] >> (8*(cpi-j-1))) & 0xFF;
+		}
+	}
 }
 
