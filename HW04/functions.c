@@ -140,12 +140,12 @@ void setupElGamal(unsigned int n, unsigned int *p, unsigned int *g,
   //compute h
   *h = modExp(*g,*x,*p);
   
-  /*printf("ElGamal Setup successful.\n");
+  printf("ElGamal Setup successful.\n");
   printf("p = %u. \n", *p);  
   printf("g = %u is a generator of Z_%u \n", *g, *p);  
   printf("Secret key: x = %u \n", *x);
   printf("h = g^x = %u\n", *h);
-  printf("\n");*/
+  printf("\n");
 }
 
 void ElGamalEncrypt(unsigned int *m, unsigned int *a, unsigned int Nints, 

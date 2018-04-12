@@ -1,0 +1,5 @@
+I could get the program to run, but the output was nothing but blue pixels.
+I later tried to fix my program, but could not find the error.
+The output (including the runtimes) are in the mandelbrot.pbs.o* file in this folder.
+Because of how unusual the runtimes are, and the fact that this program does not run correctly,
+I have not included a graph of my results.

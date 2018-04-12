@@ -25,7 +25,7 @@ int main (int argc, char **argv) {
   //begin with rank 0 getting user's input
 	unsigned int n;
 
-  /*printf("Enter a number of bits: "); fflush(stdout);
+  printf("Enter a number of bits: "); fflush(stdout);
   char status = scanf("%u",&n);
 
   //make sure the input makes sense
@@ -33,10 +33,10 @@ int main (int argc, char **argv) {
   	printf("Unsupported bit size.\n");
 		return 0;  	
   }
-  printf("\n");*/
+  printf("\n");
 
 	//NOTE: supressed all outputs except for Nthreads, time, and throughput, for ease of making graphs
-	n = 20;
+	//n = 20;
 	//printf("Entering %u bits (manual override)\n", n);
 
   //setup an ElGamal cryptosystem
@@ -48,13 +48,13 @@ int main (int argc, char **argv) {
   //populate the string with a message
   strcpy(message, "Hello, this is the message as a string.");
   //strcpy(message, "four");
-  //printf("Message = \"%s\"\n", message);
+  printf("Message = \"%s\"\n", message);
 
   /* Q1.1 Finish this line   */
   unsigned int charsPerInt = (n-1)/8;
 
   padString(message, charsPerInt);
-  //printf("Padded Message = \"%s\"\n", message);
+  printf("Padded Message = \"%s\"\n", message);
 
   unsigned int Nchars = strlen(message);
   unsigned int Nints  = strlen(message)/charsPerInt;
@@ -73,14 +73,14 @@ int main (int argc, char **argv) {
   //Encrypt the Zmessage with the ElGamal cyrptographic system
   ElGamalEncrypt(Zmessage,a,Nints,p,g,h);
 
-  //printf("The encrypted text is: [ ");
-  //for (unsigned int i=0;i<Nints;i++) {
-  //  printf("(%u,%u) ", Zmessage[i], a[i]);
-  //}
-  //printf("]\n");
+  printf("The encrypted text is: [ ");
+  for (unsigned int i=0;i<Nints;i++) {
+    printf("(%u,%u) ", Zmessage[i], a[i]);
+  }
+  printf("]\n");
 
   //Converting to Ciphertext *Bonus* -------------------------------------------------------------------------
-  /*printf("\n*BONUS* Ciphertext: ");
+  printf("\n*BONUS* Ciphertext: ");
   unsigned int lpi = 0; //letters (mod 26) per integer
   while(pow(26,lpi) < p){
 	  lpi++;
@@ -106,7 +106,7 @@ int main (int argc, char **argv) {
   }
   free(cs);
   free(cs2);
-  printf("\n\n");*/
+  printf("\n\n");
   //End Bonus ------------------------------------------------------------------------------------------------
 
   //Decrypt the Zmessage with the ElGamal cyrptographic system
@@ -114,8 +114,8 @@ int main (int argc, char **argv) {
 
   convertZToString(Zmessage, Nints, message, Nchars);
 
-  //printf("Decrypted Message = \"%s\"\n", message);
-  //printf("\n");
+  printf("Decrypted Message = \"%s\"\n", message);
+  printf("\n");
 
 
   //Suppose we don't know the secret key. Use OpenMP threads to try and find it in parallel
@@ -130,7 +130,7 @@ int main (int argc, char **argv) {
 		continue;
 	}
 	if (modExp(g,i+1,p)==h) {
-      //printf("Secret key found! x = %u \n", i+1);
+      printf("Secret key found! x = %u \n", i+1);
 	  found = 1;
     } 
   }
@@ -140,9 +140,9 @@ int main (int argc, char **argv) {
   double work = (double) p;
   double throughput = work/totalTime;
 
-  //printf("Searching all keys took %g seconds, throughput was %g values tested per second.\n", totalTime, throughput);
+  printf("Searching all keys took %g seconds, throughput was %g values tested per second.\n", totalTime, throughput);
 
-  printf("%u,%g,%g\n", Nthreads, totalTime, throughput);
+  //printf("%u,%g,%g\n", Nthreads, totalTime, throughput);
   free(message);
   free(Zmessage);
   free(a);
