@@ -40,7 +40,7 @@ __global__ void search(int N, unsigned int p, unsigned int g, unsigned int h, un
 	//find the secret key
 	unsigned int i = myY*N+myX;
 	if(i < p) {
-    	if (modExp(g,i+1,p)==h)
+    	if (modExpcu(g,i+1,p)==h)
        		*x=i+1;
 	}
 }
