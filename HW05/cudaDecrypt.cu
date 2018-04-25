@@ -32,13 +32,13 @@ __device__ unsigned int modExpcu(unsigned int a, unsigned int b, unsigned int p)
   }
   return aExpb;
 }
-__global__ void search(int N, unsigned int p, unsigned int g, unsigned int h, unsigned int* x){
+__global__ void search(unsigned int p, unsigned int g, unsigned int h, unsigned int* x){
 
     unsigned int myX = (unsigned int)(threadIdx.x+blockIdx.x*blockDim.x);
 	unsigned int myY = (unsigned int)(threadIdx.y+blockIdx.y*blockDim.y);
 
 	//find the secret key
-	unsigned int i = myY*N+myX;
+	unsigned int i = myY*blockDim.x*gridDim.x+myX;
 	if(i < p) {
     	if (modExpcu(g,i+1,p)==h)
        		*x=i+1;
@@ -57,14 +57,15 @@ int main (int argc, char **argv) {
   //printf("Enter the secret key (0 if unknown): "); fflush(stdout);
   //char stat = scanf("%u",&x);
 
-  unsigned int* h_x;
+  unsigned int* h_x = (unsigned int*)malloc(sizeof(unsigned int));
+  *h_x = 0;
 
   //printf("Reading file.\n");
 
-  FILE* f = fopen("public_key.txt", "r");
+  FILE* f = fopen("bonus_public_key.txt", "r");
   fscanf(f, "%u\n%u\n%u\n%u\n", &n, &p, &g, &h);
   fclose(f);
-  f = fopen("message.txt", "r");
+  f = fopen("bonus_message.txt", "r");
   fscanf(f, "%u\n", &Nints);
   unsigned int* Zmessage = (unsigned int*) malloc(Nints*sizeof(unsigned int));
   unsigned int* a = (unsigned int*) malloc(Nints*sizeof(unsigned int));
@@ -76,16 +77,15 @@ int main (int argc, char **argv) {
     
   unsigned int* d_x;
   cudaMalloc(&d_x, sizeof(unsigned int));
-  dim3 B(256, 256, 1);
-  int N = (n-16)/2;
-  if(N <= 0)
-	  N = 1;
-  else
-	  N = 1 << N;
+  dim3 B(32, 32, 1);
+  int N = (n-10+1)/2;
+  if(N < 0)
+	  N = 0;
+  N = 1 << N;
   dim3 G(N,N,1);
 
   double startTime = clock();
-  search<<<G,B>>>(N, p, g, h, d_x);
+  search <<< G,B >>> (p, g, h, d_x);
   cudaDeviceSynchronize();
   double endTime = clock();
 
@@ -95,16 +95,17 @@ int main (int argc, char **argv) {
 
   printf("Searching all keys took %g seconds, throughput was %g values tested per second.\n", totalTime, throughput);
   cudaMemcpy(h_x,d_x,sizeof(unsigned int),cudaMemcpyDeviceToHost);
+  printf("x=%u\n", *h_x);
   cudaFree(d_x);
 //--------------------------------------------------------------------------------------------------------------
 
   unsigned int Nchars = Nints*(n-1)/8;
+  printf("Nchars=%u\n", Nchars);
   ElGamalDecrypt(Zmessage, a, Nints, p, *h_x);
   unsigned char* message = (unsigned char*) malloc(Nchars*sizeof(unsigned char));
   convertZToString(Zmessage, Nints, message, Nchars);
   printf("Decrypted message: \"%s\"\n", message);
+  free(h_x);
   return 0;
   /* Q4 Make the search for the secret key parallel on the GPU using CUDA. */
-
-  return 0;
 }
